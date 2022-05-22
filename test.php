@@ -1,16 +1,32 @@
 <?php
-ini_set("display_errors", 'on');
-error_reporting(E_ALL);
-$file_path = realpath(__FILE__);
-echo $file_path;
-require 'vendor/autoload.php';
-$storage = new \Upload\Storage\FileSystem('saveFile');
-$file = new \Upload\File('foo', $storage);
-
-// Optionally you can rename the file on upload
+$name=$_FILES['foo']['name'];  //업로드한 파일 이름 받아오기
+$size=$_FILES['foo']['size'];
+$date = date("Y-m-d H:i:s");
 $new_filename = uniqid();
-$file->setName($new_filename);
+require 'vendor/autoload.php'; //라라벨
+$storage = new \Upload\Storage\FileSystem('saveFile'); //오픈소스 -> 파일 저장소 지정
+$file = new \Upload\File('foo', $storage); // 오픈소스 -> 파일 정보 받아오기
 
+//db 연동 
+$con = new mysqli("localhost","root","Tkddyd@135","oss");
+$con->set_charset("utf8");
+
+if ($con->connect_error) {
+  die("Fail : " .$con->connect_error); // 연결 실패 시 원인을 출력한다
+} else {
+  echo "OK"; // 연결 성공 시 웹 페이지 좌상단에 연결 성공이라는 문구를 출력한다
+}
+
+$query = "
+	INSERT INTO FileDownload
+    	(name,uname,date,size)
+    VALUES('$name','$new_filename','$date','$size');";
+mysqli_query($con,$query);
+
+$file->setName($new_filename);
+if ($result === false) { // false가 나왔다면 무슨 에러인지 출력한다(29번 줄의  태그를 주석 쳐야 제대로 볼 수 있다)
+    echo mysqli_error($con);
+}
 // Validate file upload
 // MimeType List => http://www.iana.org/assignments/media-types/media-types.xhtml
 $file->addValidations(array(
