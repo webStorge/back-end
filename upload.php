@@ -16,31 +16,27 @@ if ($con->connect_error) {
 } else {
   echo "OK"; // 연결 성공 시 웹 페이지 좌상단에 연결 성공이라는 문구를 출력한다
 }
+$number_query = "select * from FileDownload where name;";
+$number = mysqli_query($con,$number_query);
+$number_count = count($number);
 
+echo $number;
 $query = "
 	INSERT INTO FileDownload
-    	(name,uname,date,size)
-    VALUES('$name','$new_filename','$date','$size');";
+    	(number,name,uname,date,size)
+    VALUES('$number','$name','$new_filename','$date','$size');";
 mysqli_query($con,$query);
 
 $file->setName($new_filename);
 if ($result === false) { // false가 나왔다면 무슨 에러인지 출력한다(29번 줄의  태그를 주석 쳐야 제대로 볼 수 있다)
     echo mysqli_error($con);
 }
-// Validate file upload
-// MimeType List => http://www.iana.org/assignments/media-types/media-types.xhtml
+
 $file->addValidations(array(
-    // Ensure file is of type "image/png"
-    new \Upload\Validation\Mimetype('image/png'),
-
-    //You can also add multi mimetype validation
-    //new \Upload\Validation\Mimetype(array('image/png', 'image/gif'))
-
-    // Ensure file is no larger than 5M (use "B", "K", M", or "G")
-    new \Upload\Validation\Size('5M')
+    new \Upload\Validation\Mimetype('image/png'),     #이미지형식 업로드 가능
+    new \Upload\Validation\Size('5M') #5메가 까지 저장가능 
 ));
 
-// Access data about the file that has been uploaded
 $data = array(
     'name'       => $file->getNameWithExtension(),
     'extension'  => $file->getExtension(),
@@ -48,12 +44,9 @@ $data = array(
     'size'       => $file->getSize()
 );
 
-// Try to upload file
 try {
-    // Success!
     $file->upload();
 } catch (\Exception $e) {
-    // Fail!
     $errors = $file->getErrors();
 }
 ?>
