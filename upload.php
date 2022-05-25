@@ -19,12 +19,12 @@ if ($con->connect_error) {
 $number_query = "select * from FileDownload where name;";
 $number = mysqli_query($con,$number_query);
 $number_count = count($number);
-
+$names = $new_filename."".$file->getExtension();
 echo $number;
 $query = "
 	INSERT INTO FileDownload
     	(number,name,uname,date,size)
-    VALUES('$number','$name','$new_filename','$date','$size');";
+    VALUES('$number','$name','$names','$date','$size');";
 mysqli_query($con,$query);
 
 $file->setName($new_filename);
